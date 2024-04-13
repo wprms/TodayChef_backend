@@ -67,7 +67,7 @@ public class LoginApiController {
 		  throw new UserLoginException(messages, "MBB01");
 	  }
 	  
-	  if(securePassword.equals(user.getUserPassword())) {
+	  if(!securePassword.equals(user.getUserPassword())) {
 		  messages = messageUtils.getMessage("TodayChef_MBB02");
 		  throw new UserLoginException(messages, "MBB02");
 	  }
@@ -82,7 +82,6 @@ public class LoginApiController {
 	  Map<String, Object> result = new HashMap<String,Object>();
 	  result.put("stopFlag", user.getStopFlag());
 	  result.put("firstLoginFlag", firstLoginFlag);
-	  result.put("userName", user.getUserName());
 	  
 	  OAuthToken token = authService.createToken(user.getUserSysId());
 	  loginService.login(token.getRefresh_token(), user.getUserSysId());
@@ -109,11 +108,9 @@ public class LoginApiController {
 	  String userId = authCheck.authCheck(ScreenCodes.MB02, req);
 	  
 	  Map<String, Object> userInfo = new HashMap<String, Object>();
-	  
 	  userInfo.put("accessToken", accessToken);
 	  userInfo.put("userId", userId);
-	  
-	  //loginService.logoutToken(userInfo);
+	  loginService.logoutToken(userInfo);
 	  
 	  HttpHeaders headers = new HttpHeaders();
 	  headers.remove("accessToken");

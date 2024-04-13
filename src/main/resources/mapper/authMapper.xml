@@ -4,7 +4,7 @@
 <select id="authInfoFind" resultType="com.youandjang.todaychef.auth.vo.AuthInfoDto" parameterType="java.util.Map"> 
 	SELECT 
     	login_status_flag AS statusFlag
-	    ,nextmna_token AS nextmnaToken
+	    ,todaychef_token AS todaychefToken
     	,last_login_datetime AS lastLoginDatetime
 	FROM
 	    todaychef.${tableName}

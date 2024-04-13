@@ -54,7 +54,6 @@ public class JoinApiController {
 				throw new JoinException(messages, "MBB04");
 			}
 			
-			
 			String tfIdFromDB = joinService.findMaxId();			
 			String sysId = "";
 			
@@ -67,9 +66,8 @@ public class JoinApiController {
 				throw new RuntimeException("Exceeding the maximum number of members.");
 			}
 			sysId = tfSequenceToString;
-			
 			}else {
-				sysId = "001";
+				sysId = "C0000000";
 			}
 			
 			member.setUserSysId(sysId);
@@ -77,7 +75,6 @@ public class JoinApiController {
 			member.setUserPassword(securePassword);
 			member.setUserMail(userMail);		
 			member.setStopReason(getOrDefault.getOrDefaultToStringNullable(request, "stopReason", ""));
-			member.setCustomerId(getOrDefault.getOrDefaultToStringNullable(request, "customerId", ""));
 			
 			joinService.Join(member, securePassword);
 			

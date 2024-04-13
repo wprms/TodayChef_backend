@@ -21,8 +21,8 @@ public class JoinService {
 	@Autowired
 	MessageUtils messageUtils;
 	
-	public boolean isUserIdDuplicate(String id) throws Exception{
-		return mapper.checkDuplicateUserId(id)>0;	
+	public boolean isUserIdDuplicate(String userId) throws Exception{
+		return mapper.checkDuplicateUserId(userId)>0;	
 	}	
 	
 	@Transactional(isolation = Isolation.SERIALIZABLE)
@@ -55,12 +55,10 @@ public class JoinService {
 		}
 		userId = cpSequenceToString;
 		} else {
-			userId = "001";
+			userId = "C0000000";
 		}
 		
-		
 		member.setUserSysId(userId);
-		member.setJoinDate(strToday);
 		
 		int cnt = mapper.regist(member);
 		

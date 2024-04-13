@@ -36,7 +36,7 @@ public class AuthCheckUtil {
       MemberDto dto = new MemberDto();
       
       dto = commonService.findMemberId(userId);
-      authCode = dto.getAuth();
+      authCode = dto.getUserAuth();
       
       authScrns = (List<ScreenMasterDto>) commonService.findAccessibleScreen(authCode);
 
