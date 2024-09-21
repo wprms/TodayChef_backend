@@ -121,6 +121,6 @@ public class LoginApiController {
 	  res.setResultCode(ResultCodes.OK.getCode());
 	  res.setResultMessage(messages);
 	  
-	  return new ResponseEntity<TodayChefResponse>(null);
+	  return new ResponseEntity<TodayChefResponse>(res, headers, HttpStatus.OK);
   }
 }

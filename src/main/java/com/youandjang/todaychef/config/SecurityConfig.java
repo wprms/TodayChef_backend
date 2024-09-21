@@ -13,6 +13,8 @@ import com.youandjang.todaychef.auth.JwtAuthenticationProvider;
 import com.youandjang.todaychef.auth.service.AuthService;
 import com.youandjang.todaychef.util.MessageUtils;
 
+
+
 @Configuration
 public class SecurityConfig {
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -35,21 +37,29 @@ public class SecurityConfig {
 		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManagerBuilder.getOrBuild(),
 				authService, messageUtils);
 		
-        http
-            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-        /*    .securityMatchers((matchers) -> matchers.requestMatchers(
-                		"/testapi/**"
-                 		))*/
-            .authorizeHttpRequests(authz -> authz
-            		.requestMatchers(                		    
-                		    "/forget/id"
-                		    ,"/forget/password"
-            			    ,"/resources/**"
-            			    ,"/error"
-            			    ,"/join/**"
-            			    ,"/login").permitAll()
-            .anyRequest().authenticated());
-		http.csrf(csrf -> csrf.ignoringRequestMatchers("/**"));
-		return http.build();
-	}
+		http
+        .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+        .authorizeHttpRequests(authz -> authz
+            .requestMatchers(
+                "/forget/id",
+                "/forget/password",
+                "/resources/**",
+                "/error",
+                "/join/**",
+                "/login",
+                "/logout" // 로그아웃 경로 허용
+            ).permitAll()
+            .anyRequest().authenticated())
+        .logout(logout -> logout
+            .logoutUrl("/logout") // 로그아웃 요청 URL
+            .invalidateHttpSession(true) // 세션 무효화
+            .clearAuthentication(true) // 인증 정보 제거
+            .logoutSuccessUrl("/login") // 로그아웃 성공 시 리다이렉트할 경로 설정
+        )
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/**")); // 모든 경로에 대해 CSRF 비활성화
+
+    return http.build();
+}
+
+
 }
