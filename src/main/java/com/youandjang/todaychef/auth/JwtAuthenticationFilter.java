@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String refreshToken = null;
 		String servletPath = request.getServletPath();
 		AuthInfoDto authInfo = new AuthInfoDto();
-			if (servletPath.equals("/join/form") || servletPath.equals("/join/form")) {
+			if (servletPath.equals("/join/form")) {
 				filterChain.doFilter(request, response);
 				return;
 			}

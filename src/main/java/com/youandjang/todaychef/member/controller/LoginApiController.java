@@ -98,7 +98,7 @@ public class LoginApiController {
 	  return new ResponseEntity<TodayChefResponse>(res, headers, HttpStatus.OK);
   }
   
-  @PostMapping("/logout")
+  @PostMapping("member/logout")
   public ResponseEntity<TodayChefResponse> LogOut(HttpServletRequest req) throws Exception{
 	  
 	  TodayChefResponse res = new TodayChefResponse();
@@ -116,7 +116,7 @@ public class LoginApiController {
 	  headers.remove("accessToken");
 	  headers.remove("lastLoginTime");
 	  
-	  String messages = messageUtils.getMessage("");
+	  String messages = messageUtils.getMessage("TodayChef_STI01");
 	  res.setResult(result);
 	  res.setResultCode(ResultCodes.OK.getCode());
 	  res.setResultMessage(messages);
