@@ -9,8 +9,8 @@ import com.youandjang.todaychef.member.vo.MemberDto;
 public class JoinDaoImpl extends HelpSqlSessionTemplate implements JoinDao {
 
 	@Override
-	public int checkDuplicateUserId(String id) throws Exception {
-		return getSqlSessionTemplate().selectOne("memberMapper.checkDuplicateUserId", id);
+	public int checkDuplicateUserId(String userId) throws Exception {
+		return getSqlSessionTemplate().selectOne("memberMapper.checkDuplicateUserId", userId);
 	}
 
 	@Override

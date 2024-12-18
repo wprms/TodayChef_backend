@@ -8,9 +8,9 @@
         ,scn.screen_code
         ,scn.screen_name
     FROM 
-        todaychef.auth_mgt
+        auth_mgt auth
     INNER JOIN 
-        todaychef.screen_mst
+        screen_mst scn
         ON
             auth.screen_code = scn.screen_code
         AND
@@ -23,13 +23,12 @@
 
 <select id="findMemberId" resultType="com.youandjang.todaychef.member.vo.MemberDto" parameterType="String">
     SELECT 
-        sys_id AS sysId
+        user_sys_id AS userSysId
         ,last_gene_flag AS lastGeneFlag
         ,user_auth AS userAuth
-        ,todaychef_token AS todayChefToken
-        ,login_id AS loginId
-        ,password AS password
-        ,customer_id AS customerId
+        ,todaychef_token AS todaychefToken
+        ,user_login_id AS userLoginId
+        ,user_password AS userPassword
         ,user_mail AS userMail
         ,login_status_flag AS loginStatusFlag
         ,last_login_datetime AS lastLoginDatetime
@@ -37,9 +36,9 @@
         ,stop_reason AS stopReason
         ,temp_flag AS tempFlag
     FROM 
-        todaychef.member_mgt
+        member_mgt
     WHERE
-        sys_id = #{userId}
+       user_sys_id = #{userId}
     AND
         last_gene_flag = '1'
     AND
@@ -50,11 +49,11 @@
 		SELECT
 			file_idx AS fileIdx
 		FROM
-    		todaychef.file_mgt
+    		file_mgt
 		WHERE
 			logical_del_flag = '0'
 		AND
-			sys_id = #{sysId}
+			user_sys_id = #{sysId}
 </select>
 	
 </mapper>

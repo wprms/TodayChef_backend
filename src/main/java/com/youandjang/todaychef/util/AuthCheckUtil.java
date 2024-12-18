@@ -28,7 +28,8 @@ public class AuthCheckUtil {
    public String authCheck(Enum<ScreenCodes> scrnCode, HttpServletRequest req) throws Exception{
 
       List<ScreenMasterDto> authScrns = new ArrayList<ScreenMasterDto>();
-        String userId = TakeIdUtil.takeIdUtility(req);
+      
+      String userId = TakeIdUtil.takeIdUtility(req);
 
       boolean authFlg = false;
       String authCode = "";
@@ -36,7 +37,7 @@ public class AuthCheckUtil {
       MemberDto dto = new MemberDto();
       
       dto = commonService.findMemberId(userId);
-      authCode = dto.getAuth();
+      authCode = dto.getUserAuth();
       
       authScrns = (List<ScreenMasterDto>) commonService.findAccessibleScreen(authCode);
 

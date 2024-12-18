@@ -13,6 +13,8 @@ import com.youandjang.todaychef.auth.JwtAuthenticationProvider;
 import com.youandjang.todaychef.auth.service.AuthService;
 import com.youandjang.todaychef.util.MessageUtils;
 
+
+
 @Configuration
 public class SecurityConfig {
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -35,21 +37,22 @@ public class SecurityConfig {
 		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManagerBuilder.getOrBuild(),
 				authService, messageUtils);
 		
-        http
-            .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-        /*    .securityMatchers((matchers) -> matchers.requestMatchers(
-                		"/testapi/**"
-                 		))*/
-            .authorizeHttpRequests(authz -> authz
-            		.requestMatchers(                		    
-                		    "/forget/id"
-                		    ,"/forget/password"
-            			    ,"/resources/**"
-            			    ,"/error"
-            			    ,"/join/**"
-            			    ,"/login").permitAll()
+		http
+        .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+        .authorizeHttpRequests(authz -> authz
+            .requestMatchers(
+                "/forget/id",
+                "/forget/password",
+                "/resources/**",
+                "/error",
+                "/join/**",
+                "/login"
+            ).permitAll()
             .anyRequest().authenticated());
-		http.csrf(csrf -> csrf.ignoringRequestMatchers("/**"));
-		return http.build();
-	}
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/**"));
+
+    return http.build();
+}
+
+
 }

@@ -67,7 +67,7 @@ public class LoginApiController {
 		  throw new UserLoginException(messages, "MBB01");
 	  }
 	  
-	  if(securePassword.equals(user.getUserPassword())) {
+	  if(!securePassword.equals(user.getUserPassword())) {
 		  messages = messageUtils.getMessage("TodayChef_MBB02");
 		  throw new UserLoginException(messages, "MBB02");
 	  }
@@ -82,7 +82,6 @@ public class LoginApiController {
 	  Map<String, Object> result = new HashMap<String,Object>();
 	  result.put("stopFlag", user.getStopFlag());
 	  result.put("firstLoginFlag", firstLoginFlag);
-	  result.put("userName", user.getUserName());
 	  
 	  OAuthToken token = authService.createToken(user.getUserSysId());
 	  loginService.login(token.getRefresh_token(), user.getUserSysId());
@@ -99,7 +98,7 @@ public class LoginApiController {
 	  return new ResponseEntity<TodayChefResponse>(res, headers, HttpStatus.OK);
   }
   
-  @PostMapping("/logout")
+  @PostMapping("member/logout")
   public ResponseEntity<TodayChefResponse> LogOut(HttpServletRequest req) throws Exception{
 	  
 	  TodayChefResponse res = new TodayChefResponse();
@@ -109,21 +108,19 @@ public class LoginApiController {
 	  String userId = authCheck.authCheck(ScreenCodes.MB02, req);
 	  
 	  Map<String, Object> userInfo = new HashMap<String, Object>();
-	  
 	  userInfo.put("accessToken", accessToken);
 	  userInfo.put("userId", userId);
-	  
-	  //loginService.logoutToken(userInfo);
+	  loginService.logoutToken(userInfo);
 	  
 	  HttpHeaders headers = new HttpHeaders();
 	  headers.remove("accessToken");
 	  headers.remove("lastLoginTime");
 	  
-	  String messages = messageUtils.getMessage("");
+	  String messages = messageUtils.getMessage("TodayChef_STI01");
 	  res.setResult(result);
 	  res.setResultCode(ResultCodes.OK.getCode());
 	  res.setResultMessage(messages);
 	  
-	  return new ResponseEntity<TodayChefResponse>(null);
+	  return new ResponseEntity<TodayChefResponse>(res, headers, HttpStatus.OK);
   }
 }

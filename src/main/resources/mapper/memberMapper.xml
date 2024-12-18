@@ -6,7 +6,7 @@
     UPDATE 
 	    member_mgt
 	SET 
-	    todaychef_token = #{refreshToken},
+	    todaychef_token=#{refreshToken},
 		last_login_datetime=now(),
 		login_status_flag = '1'
 	WHERE 
@@ -22,11 +22,11 @@
     UPDATE 
 	    member_mgt
 	SET 
-	    todaychef_token = #{accessToken},
+	    todaychef_token=#{accessToken},
 		rec_update_date=now(),
-		login_status_flag = '0'
+		login_status_flag='0'
 	WHERE 
-	    user_login_id = #{userId}
+	    user_login_id=#{userId}
 	AND 
 	    logical_del_flag='0'
 	AND 
@@ -59,7 +59,7 @@
 
 <select id="checkDuplicateUserId" resultType="integer" parameterType="String">
 	SELECT
-		COUNT(*) AS count
+		COUNT(*) as count
 	FROM
 		member_mgt
 	WHERE
@@ -67,7 +67,7 @@
 	AND
 		stop_flag != '1'
 	AND
-		user_login_id = #{Id}
+		user_login_id = #{userId}
 </select>
 
 <select id="findMaxId" resultType="String">
@@ -100,7 +100,7 @@
 	) VALUES (
 		#{userSysId},
 		'1',
-		'BY',
+		'01',
 		'0',
 		#{userLoginId},
 		#{userPassword},

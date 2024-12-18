@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
+	private static final long serialVersionUID = 1L;
 	private String jsonwebToken;
 	private Object principal;
 	private Object credentials;

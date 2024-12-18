@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String refreshToken = null;
 		String servletPath = request.getServletPath();
 		AuthInfoDto authInfo = new AuthInfoDto();
-			if (servletPath.equals("/join/form") || servletPath.equals("/join/form")) {
+			if (servletPath.equals("/join/form")) {
 				filterChain.doFilter(request, response);
 				return;
 			}
@@ -68,16 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			            throw new InvalidTokenException(messages, "STB02");
 					}
 					
-
-			//		if (authInfo.getStatusFlag().charAt(0) == '1') {
-			//			SecurityContextHolder.clearContext();
-			//			response.setHeader("accessToken", "");
-			//		}
-					
 					try {
 						Timestamp lastLoginDatetime = Timestamp.valueOf(request.getHeader("lastLoginTime")); 
 						Timestamp lastLogin = authInfo.getLastLoginDatetime();
-							// jobseeker not check duplicate access
+						
 						if (!lastLoginDatetime.equals(lastLogin)) {
 							if (lastLoginDatetime.before(lastLogin)) {
 								SecurityContextHolder.clearContext();

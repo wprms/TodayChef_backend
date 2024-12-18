@@ -22,7 +22,6 @@ public class LoginService {
 		return mapper.logoutToken(userInfo);
 	}
 	
-	
 	public MemberDto findLoginId(String userId) throws Exception{
 		return mapper.findLoginId(userId);
 	}

@@ -4,10 +4,10 @@
 <select id="authInfoFind" resultType="com.youandjang.todaychef.auth.vo.AuthInfoDto" parameterType="java.util.Map"> 
 	SELECT 
     	login_status_flag AS statusFlag
-	    ,nextmna_token AS nextmnaToken
+	    ,todaychef_token AS todaychefToken
     	,last_login_datetime AS lastLoginDatetime
 	FROM
-	    todaychef.${tableName}
+	    ${tableName}
 	WHERE ${columnName} = #{userId}
 	AND logical_del_flag = '0'
 	AND last_gene_flag = '1'
