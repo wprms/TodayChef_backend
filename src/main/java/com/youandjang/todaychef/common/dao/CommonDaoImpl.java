@@ -19,7 +19,7 @@ public class CommonDaoImpl extends HelpSqlSessionTemplate implements CommonDao {
 	@Override
 	public String getFileIdxAsFileMgt(String sysId) throws Exception {
 		List<String> resultList = getSqlSessionTemplate().selectList("commonMapper.getFileIdxAsFileMgt", sysId);
-		
+
 		String resultArrayStr = resultList.toString();
 		resultArrayStr = resultArrayStr.replace("[", "");
 		resultArrayStr = resultArrayStr.replace("]", "");

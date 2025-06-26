@@ -16,23 +16,24 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class FindApiController {
-	
+
 	@Autowired
 	GetOrDefaultUtil getOrDefault;
 	@Autowired
 	MessageUtils messageUtils;
-	
-	private final String inputErrorMessage = "TodayChef_CMB06" ;
-	
-  @PostMapping("/findId")
-  public ResponseEntity<TodayChefResponse> FindId(HttpServletRequest req, @RequestBody Map<String, Object> request) throws Exception{
-	  
-	  String inputMail = getOrDefault.getOrDefaultToString(request, "inputMail","",inputErrorMessage);
-	  System.out.println(inputMail);
-	  
-	  return new ResponseEntity<TodayChefResponse>(null);
-  }
-  
+
+	private final String inputErrorMessage = "TodayChef_CMB06";
+
+	@PostMapping("/findId")
+	public ResponseEntity<TodayChefResponse> FindId(HttpServletRequest req, @RequestBody Map<String, Object> request)
+			throws Exception {
+
+		String inputMail = getOrDefault.getOrDefaultToString(request, "inputMail", "", inputErrorMessage);
+		System.out.println(inputMail);
+
+		return new ResponseEntity<TodayChefResponse>(null);
+	}
+
 //  @PostMapping("/findPW")
 //  public ResponseEntity<TodayChefResponse> LogOut(HttpServletRequest req, @RequestBody Map<String, Object> request) throws Exception{
 //	  
