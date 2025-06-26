@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.youandjang.todaychef.config.HelpSqlSessionTemplate;
 import com.youandjang.todaychef.member.vo.MemberDto;
 
-
 @Repository
 public class LoginDaoImpl extends HelpSqlSessionTemplate implements LoginDao {
 

@@ -22,5 +22,5 @@ public class JoinDaoImpl extends HelpSqlSessionTemplate implements JoinDao {
 	public String findMaxId() throws Exception {
 		return getSqlSessionTemplate().selectOne("memberMapper.findMaxId");
 	}
-	
+
 }

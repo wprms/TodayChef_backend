@@ -47,32 +47,32 @@ public class CommonService {
 		return mapper.findAccessibleScreen(authCode);
 	}
 
-	public void sendEmail(List<String> recipients, String title, String contents, List<String> ccList) throws Exception {
+	public void sendEmail(List<String> recipients, String title, String contents, List<String> ccList)
+			throws Exception {
 
 		int port = 465; // 決まってるportを使う
-		
+
 		List<String> emailList = new ArrayList<String>();
-	    List<String> ccEmailList = new ArrayList<String>(); 
-	    MemberDto dto = new MemberDto();
+		List<String> ccEmailList = new ArrayList<String>();
+		MemberDto dto = new MemberDto();
 
 		for (int i = 0; i < recipients.size(); i++) {
-		    	dto = findMemberId(recipients.get(i));
-	            emailList.add(dto.getUserMail());
-	      }
-	      
-	      for (int i = 0; i < ccList.size(); i++) {
-	    	   dto = findMemberId(ccList.get(i));
-	            ccEmailList.add(dto.getUserMail());
-	      }
+			dto = findMemberId(recipients.get(i));
+			emailList.add(dto.getUserMail());
+		}
 
-		
-		//受信者追加
+		for (int i = 0; i < ccList.size(); i++) {
+			dto = findMemberId(ccList.get(i));
+			ccEmailList.add(dto.getUserMail());
+		}
+
+		// 受信者追加
 		InternetAddress[] toEmails = new InternetAddress[emailList.size()];
 		for (int i = 0; i < emailList.size(); i++) {
 			toEmails[i] = new InternetAddress(emailList.get(i));
 		}
 
-		//参照者追加
+		// 参照者追加
 		InternetAddress[] toCcList = new InternetAddress[ccEmailList.size()];
 		for (int i = 0; i < ccEmailList.size(); i++) {
 			toCcList[i] = new InternetAddress(ccEmailList.get(i));
@@ -121,8 +121,8 @@ public class CommonService {
 	public void sendEmail(List<String> emailList, String title, String contents) throws Exception {
 
 		int port = 465; // 決まってるportを使う
-		
-		//受信者追加
+
+		// 受信者追加
 		InternetAddress[] toEmails = new InternetAddress[emailList.size()];
 		for (int i = 0; i < emailList.size(); i++) {
 			toEmails[i] = new InternetAddress(emailList.get(i));
@@ -166,14 +166,14 @@ public class CommonService {
 			throw new TodayChefException(messages, e);
 		}
 	}
-	
+
 	public boolean sendEmailByAddress(List<String> email, String tilte, String contents) throws Exception {
 
 		boolean errorFlag = false;
-		
+
 		int port = 465; // 決まってるportを使う
-		
-		//受信者追加
+
+		// 受信者追加
 		InternetAddress[] toEmails = new InternetAddress[email.size()];
 		for (int i = 0; i < email.size(); i++) {
 			toEmails[i] = new InternetAddress(email.get(i));
