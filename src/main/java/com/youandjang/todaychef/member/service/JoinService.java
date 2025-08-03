@@ -1,8 +1,5 @@
 package com.youandjang.todaychef.member.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -37,10 +34,6 @@ public class JoinService {
 
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public int regist(MemberDto member) throws Exception {
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Calendar c1 = Calendar.getInstance();
-		String strToday = sdf.format(c1.getTime());
 
 		String cpIdFromDB = mapper.findMaxId();
 		String userId = "";
