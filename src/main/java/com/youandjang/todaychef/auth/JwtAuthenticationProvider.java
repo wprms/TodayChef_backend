@@ -1,6 +1,7 @@
 package com.youandjang.todaychef.auth;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,14 +18,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-	private final byte[] secretKeyByte;
+	private final SecretKey signingKey;
 
 	public JwtAuthenticationProvider(@Value("${oauth.secret}") String secretKey) {
-		this.secretKeyByte = secretKey.getBytes();
+		String base64 = Base64.getEncoder().encodeToString(secretKey.getBytes());
+		this.signingKey = Keys.hmacShaKeyFor(base64.getBytes());
 	}
 
 	private Collection<? extends GrantedAuthority> createGrantedAuthorities(Claims claims) {
@@ -35,9 +39,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		Claims claims;
-		try {
-			claims = Jwts.parserBuilder().setSigningKey(secretKeyByte).build()
-					.parseClaimsJws(((JwtAuthenticationToken) authentication).getJsonWebToken()).getBody();
+			try {
+				claims = Jwts.parserBuilder().setSigningKey(signingKey).build()
+						.parseClaimsJws(((JwtAuthenticationToken) authentication).getJsonWebToken()).getBody();
 		} catch (ExpiredJwtException expiredJwtException) {
 			throw new JwtInvalidException("expired token", expiredJwtException);
 		} catch (MalformedJwtException malformedJwtException) {

@@ -40,6 +40,8 @@ public class LoginApiController {
 	LoginService loginService;
 	@Autowired
 	AuthService authService;
+	@Autowired
+	SecurityUtil securityUtil;
 
 	private final String inputErrorMessage = "TodayChef_CMB06";
 
@@ -53,9 +55,6 @@ public class LoginApiController {
 		String password = getOrDefault.getOrDefaultToString(request, "password", "", inputErrorMessage);
 		String messages = messageUtils.getMessage("TodayChef_STI01");
 
-		SecurityUtil security = new SecurityUtil();
-		String securePassword = security.encryptSHA256(password);
-
 		try {
 			user = loginService.findLoginId(userId);
 		} catch (Exception e) {
@@ -68,7 +67,7 @@ public class LoginApiController {
 			throw new UserLoginException(messages, "MBB01");
 		}
 
-		if (!securePassword.equals(user.getUserPassword())) {
+		if (ObjectUtil.isEmpty(user) || !securityUtil.matchesPassword(password, user.getUserPassword())) {
 			messages = messageUtils.getMessage("TodayChef_MBB02");
 			throw new UserLoginException(messages, "MBB02");
 		}
@@ -90,6 +89,7 @@ public class LoginApiController {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("accessToken", token.getAccess_token());
+		headers.add("refreshToken", token.getRefresh_token());
 		headers.add("lastLoginTime", user.getLastLoginDatetime().toString());
 
 		res.setResult(result);
@@ -105,11 +105,9 @@ public class LoginApiController {
 		TodayChefResponse res = new TodayChefResponse();
 		Map<String, Object> result = new HashMap<String, Object>();
 
-		String accessToken = req.getHeader("accessToken");
 		String userId = authCheck.authCheck(ScreenCodes.MB02, req);
 
 		Map<String, Object> userInfo = new HashMap<String, Object>();
-		userInfo.put("accessToken", accessToken);
 		userInfo.put("userId", userId);
 		loginService.logoutToken(userInfo);
 

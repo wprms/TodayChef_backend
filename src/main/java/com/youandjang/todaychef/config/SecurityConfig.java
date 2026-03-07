@@ -5,11 +5,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.youandjang.todaychef.auth.JwtAuthenticationFilter;
 import com.youandjang.todaychef.auth.JwtAuthenticationProvider;
+import com.youandjang.todaychef.auth.JsonWebTokenIssuer;
 import com.youandjang.todaychef.auth.service.AuthService;
 import com.youandjang.todaychef.util.MessageUtils;
 
@@ -33,9 +37,9 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	protected SecurityFilterChain securityFilterChain(HttpSecurity http, JsonWebTokenIssuer jwtIssuer) throws Exception {
 		JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManagerBuilder.getOrBuild(),
-				authService, messageUtils);
+				authService, messageUtils, jwtIssuer);
 		
 		http
         .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
@@ -49,10 +53,14 @@ public class SecurityConfig {
                 "/login"
             ).permitAll()
             .anyRequest().authenticated());
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/**"));
+        http.csrf(csrf -> csrf.disable())
+        	.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     return http.build();
 }
 
-
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

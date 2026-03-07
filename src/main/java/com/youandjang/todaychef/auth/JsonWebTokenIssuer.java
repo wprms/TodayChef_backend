@@ -23,18 +23,19 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletResponse;
+import javax.crypto.SecretKey;
 
 @Component
 @PropertySource(value = "classpath:security.properties", encoding = "UTF-8")
 public class JsonWebTokenIssuer {
    private final int ONE_SECONDS = 1000;
    private final int ONE_MINUTE = 60 * ONE_SECONDS;
-   private final String KEY_ROLES = "roles";
-   private static String secretKey;
-   private static String refreshSecretKey;
-   private static int expireMin;
-   private static int refreshExpireMin;
+   private String secretKey;
+   private String refreshSecretKey;
+   private int expireMin;
+   private int refreshExpireMin;
    
    @Value("${oauth.secret}")
    public void setSecretKey(String tmp) {
@@ -58,26 +59,24 @@ public class JsonWebTokenIssuer {
    
    //CreateToken
    private String createToken(String userId, int expireMin) {
-      String realSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
       Claims claims = Jwts.claims().setSubject(userId);
       Date now = new Date();
       return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(new Date(now.getTime() + ONE_MINUTE * expireMin))
-            .signWith(SignatureAlgorithm.HS256, realSecretKey)
+            .signWith(accessSigningKey(), SignatureAlgorithm.HS256)
             .compact();
    }
 
    private String createRefreshToken(String userId, int expireMin) {
-      String realRefreshKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
       Claims claims = Jwts.claims().setSubject(userId);
       Date now = new Date();
       return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(new Date(now.getTime() + ONE_MINUTE * expireMin))
-            .signWith(SignatureAlgorithm.HS256, realRefreshKey)
+            .signWith(refreshSigningKey(), SignatureAlgorithm.HS256)
             .compact();
    }
 
@@ -103,9 +102,8 @@ public class JsonWebTokenIssuer {
 
    // Token Check Without Expire Check
    public boolean validateToken(String jwtToken) {
-      String realSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
       try {
-         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(realSecretKey).build().parseClaimsJws(jwtToken);
+         Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(accessSigningKey()).build().parseClaimsJws(jwtToken);
          return !claims.getBody().getExpiration().before(new Date());
       } catch (ExpiredJwtException expiredJwtException) {
          return false;
@@ -117,10 +115,9 @@ public class JsonWebTokenIssuer {
    }
 
    public boolean validateRefreshToken(String refreshToken) {
-      String realRefreshKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
       Jws<Claims> claims;
       try {
-         claims = Jwts.parserBuilder().setSigningKey(realRefreshKey).build().parseClaimsJws(refreshToken);
+         claims = Jwts.parserBuilder().setSigningKey(refreshSigningKey()).build().parseClaimsJws(refreshToken);
          return !claims.getBody().getExpiration().before(new Date());
       } catch (ExpiredJwtException expiredJwtException) {
          return false;
@@ -133,8 +130,7 @@ public class JsonWebTokenIssuer {
 
    //RefreshToken Check UserId
    public String refreshUserIdCheck(String refreshToken) {
-      String realRefreshKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
-      Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(realRefreshKey).build().parseClaimsJws(refreshToken);
+      Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(refreshSigningKey()).build().parseClaimsJws(refreshToken);
       return claims.getBody().getSubject().toString();
    }
 
@@ -157,10 +153,9 @@ public class JsonWebTokenIssuer {
 
    //RefreshToken Check
    public Claims parseClaimsFromRefreshToken(String jsonWebToken) {
-      String realSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
       Claims claims;
       try {
-         claims = Jwts.parserBuilder().setSigningKey(realSecretKey).build()
+         claims = Jwts.parserBuilder().setSigningKey(accessSigningKey()).build()
                .parseClaimsJws(jsonWebToken)
                .getBody();
       } catch (MalformedJwtException malformedJwtException) {
@@ -171,5 +166,14 @@ public class JsonWebTokenIssuer {
       return claims;
    }
 
+   private SecretKey accessSigningKey() {
+      String base64 = Base64.getEncoder().encodeToString(secretKey.getBytes());
+      return Keys.hmacShaKeyFor(base64.getBytes());
+   }
+
+   private SecretKey refreshSigningKey() {
+      String base64 = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes());
+      return Keys.hmacShaKeyFor(base64.getBytes());
+   }
 
 }

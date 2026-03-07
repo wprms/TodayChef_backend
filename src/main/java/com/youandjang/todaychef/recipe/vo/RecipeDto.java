@@ -1,20 +1,28 @@
 package com.youandjang.todaychef.recipe.vo;
 
 import java.sql.Timestamp;
-import java.util.Map;
 
 public class RecipeDto {
+	String id;
 	String userSysId;
 	String recipeTitle;
 	String recipeInfo;
-	Map<String, Object> recipeSteps;
-	String RecipeInstagramLink;
-	String RecipeVideoLink;
+	String recipeSteps;
+	String recipeThumbnailImage;
+	String recipeInstagramLink;
+	String recipeVideoLink;
 	String recCreateId;
 	String recUpdateId;
 	Timestamp recUpdateDateTime;
 	Timestamp recCreateDatetime;
 	char logicalDelFlag;
+
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 	public String getUserSysId() {
 		return userSysId;
@@ -34,23 +42,29 @@ public class RecipeDto {
 	public void setRecipeInfo(String recipeInfo) {
 		this.recipeInfo = recipeInfo;
 	}
-	public Map<String, Object> getRecipeSteps() {
+	public String getRecipeSteps() {
 		return recipeSteps;
 	}
-	public void setRecipeSteps(Map<String, Object> recipeSteps) {
+	public void setRecipeSteps(String recipeSteps) {
 		this.recipeSteps = recipeSteps;
 	}
+	public String getRecipeThumbnailImage() {
+		return recipeThumbnailImage;
+	}
+	public void setRecipeThumbnailImage(String recipeThumbnailImage) {
+		this.recipeThumbnailImage = recipeThumbnailImage;
+	}
 	public String getRecipeInstagramLink() {
-		return RecipeInstagramLink;
+		return recipeInstagramLink;
 	}
 	public void setRecipeInstagramLink(String recipeInstagramLink) {
-		RecipeInstagramLink = recipeInstagramLink;
+		this.recipeInstagramLink = recipeInstagramLink;
 	}
 	public String getRecipeVideoLink() {
-		return RecipeVideoLink;
+		return recipeVideoLink;
 	}
 	public void setRecipeVideoLink(String recipeVideoLink) {
-		RecipeVideoLink = recipeVideoLink;
+		this.recipeVideoLink = recipeVideoLink;
 	}
 	public String getRecCreateId() {
 		return recCreateId;

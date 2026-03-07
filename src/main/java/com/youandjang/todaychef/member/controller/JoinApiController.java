@@ -30,6 +30,8 @@ public class JoinApiController {
 	MessageUtils messageUtils;
 	@Autowired
 	GetOrDefaultUtil getOrDefault;
+	@Autowired
+	SecurityUtil securityUtil;
 
 	private final String joinErrorMessage = "TodayChef_MBB05";
 
@@ -40,12 +42,10 @@ public class JoinApiController {
 		Map<String, Object> result = new HashMap<String, Object>();
 
 		MemberDto member = new MemberDto();
-		SecurityUtil security = new SecurityUtil();
-
 		String loginId = getOrDefault.getOrDefaultToString(request, "loginId", "", joinErrorMessage);
 		String password = getOrDefault.getOrDefaultToString(request, "password", "", joinErrorMessage);
 		String userMail = getOrDefault.getOrDefaultToString(request, "mail", "", joinErrorMessage);
-		String securePassword = security.encryptSHA256(password);
+		String securePassword = securityUtil.encryptPassword(password);
 
 		boolean isDuplication = joinService.isUserIdDuplicate(loginId);
 		if (isDuplication) {
@@ -53,29 +53,12 @@ public class JoinApiController {
 			throw new JoinException(messages, "MBB04");
 		}
 
-		String tfIdFromDB = joinService.findMaxId();
-		String sysId = "";
-
-		if (tfIdFromDB != null) {
-			int tfSequence = Integer.parseInt(tfIdFromDB);
-			tfSequence++;
-			String tfSequenceToString = String.valueOf(tfSequence);
-			int calDigitNum = tfSequenceToString.length();
-			if (calDigitNum < 0) {
-				throw new RuntimeException("Exceeding the maximum number of members.");
-			}
-			sysId = tfSequenceToString;
-		} else {
-			sysId = "C0000000";
-		}
-
-		member.setUserSysId(sysId);
 		member.setUserLoginId(loginId);
 		member.setUserPassword(securePassword);
 		member.setUserMail(userMail);
 		member.setStopReason(getOrDefault.getOrDefaultToStringNullable(request, "stopReason", ""));
 
-		joinService.Join(member, securePassword);
+		joinService.Join(member);
 
 		res.setResult(result);
 		res.setResultCode(ResultCodes.OK.getCode());

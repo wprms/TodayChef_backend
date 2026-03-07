@@ -22,7 +22,7 @@
     UPDATE 
 	    member_mgt
 	SET 
-	    todaychef_token=#{accessToken},
+	    todaychef_token='0',
 		rec_update_date=now(),
 		login_status_flag='0'
 	WHERE 

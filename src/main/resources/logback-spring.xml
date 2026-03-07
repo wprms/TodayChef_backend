@@ -22,6 +22,9 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <!-- login log filter 設定(fileで設定可能) -->
     	<filter class="com.youandjang.todaychef.util.LogbackFilterUtil"/>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
@@ -32,6 +35,9 @@
         <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
 	<!-- login log filter 設定(fileで設定可能) -->
     <filter class="com.youandjang.todaychef.util.LogbackFilterUtil"/>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <level>INFO</level>
+    </filter>
     <!-- 出力パターン設定-->
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
         <pattern>${LOG_PATTERN}</pattern>
@@ -43,7 +49,7 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>90</maxHistory>
+            <maxHistory>15</maxHistory>
             <totalSizeCap>300MB</totalSizeCap>
         </rollingPolicy>
     </appender>
@@ -67,7 +73,7 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>90</maxHistory>
+            <maxHistory>15</maxHistory>
             <totalSizeCap>100MB</totalSizeCap>
         </rollingPolicy>
     </appender>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="recipeMapper">
+<insert id="recipeUpload" parameterType="com.youandjang.todaychef.recipe.vo.RecipeDto"> 
+	INSERT
+	INTO recipe_mgt(
+		user_sys_id,
+		recipe_title,
+		recipe_info,
+		recipe_steps,
+		recipe_thumbnail_image,
+		recipe_Instagram_link,
+		recipe_video_link,
+		rec_create_id,
+		rec_create_date,
+		rec_update_id,
+		rec_update_date,
+		logical_del_flag
+	) VALUES (
+		#{userSysId},
+		#{recipeTitle},
+		#{recipeInfo},
+		#{recipeSteps},
+		#{recipeThumbnailImage},
+		#{recipeInstagramLink},
+		#{recipeVideoLink},
+		#{userSysId},
+		now(),
+		#{userSysId},
+		now(),
+		'0'	
+	)
+</insert>
+
+<select id="recipeList" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_steps AS recipeSteps,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	ORDER BY
+		rec_create_date DESC
+</select>
+
+<select id="recipeDetail" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto" parameterType="String">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_steps AS recipeSteps,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+</select>
+
+<select id="myRecipeList" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto" parameterType="String">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_steps AS recipeSteps,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	AND
+		user_sys_id = #{userId}
+	ORDER BY
+		rec_create_date DESC
+</select>
+
+<update id="recipeUpdate" parameterType="com.youandjang.todaychef.recipe.vo.RecipeDto">
+	UPDATE
+		recipe_mgt
+	SET
+		recipe_title = #{recipeTitle},
+		recipe_info = #{recipeInfo},
+		recipe_steps = #{recipeSteps},
+		recipe_thumbnail_image = #{recipeThumbnailImage},
+		recipe_instagram_link = #{recipeInstagramLink},
+		recipe_video_link = #{recipeVideoLink},
+		rec_update_id = #{userSysId},
+		rec_update_date = now()
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+	AND
+		user_sys_id = #{userSysId}
+</update>
+
+<update id="recipeDelete" parameterType="java.util.Map">
+	UPDATE
+		recipe_mgt
+	SET
+		logical_del_flag = '1',
+		rec_update_id = #{userId},
+		rec_update_date = now()
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+	AND
+		user_sys_id = #{userId}
+</update>
+</mapper>

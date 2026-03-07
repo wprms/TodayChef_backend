@@ -23,7 +23,7 @@ public class JoinService {
 	}
 
 	@Transactional(isolation = Isolation.SERIALIZABLE)
-	public void Join(MemberDto member, String password) throws Exception {
+	public void Join(MemberDto member) throws Exception {
 
 		int cnt = regist(member);
 		if (cnt == 0) {
@@ -40,9 +40,9 @@ public class JoinService {
 		if (cpIdFromDB != null) {
 			int cpSequence = Integer.parseInt(cpIdFromDB.substring(1));
 			cpSequence++;
-			String cpSequenceToString = String.valueOf(cpSequence);
+			String cpSequenceToString = String.format("C%07d", cpSequence);
 			int calDigitNum = cpSequenceToString.length();
-			if (calDigitNum < 0) {
+			if (calDigitNum > 8) {
 				String messages = messageUtils.getMessage("TodayChef_MBB06");
 				throw new JoinException(messages, "MBB06");
 			}
