@@ -12,8 +12,6 @@ import com.youandjang.todaychef.common.vo.TodayChefResponse;
 import com.youandjang.todaychef.util.GetOrDefaultUtil;
 import com.youandjang.todaychef.util.MessageUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @RestController
 public class FindApiController {
 
@@ -25,20 +23,11 @@ public class FindApiController {
 	private final String inputErrorMessage = "TodayChef_CMB06";
 
 	@PostMapping("/findId")
-	public ResponseEntity<TodayChefResponse> FindId(HttpServletRequest req, @RequestBody Map<String, Object> request)
+	public ResponseEntity<TodayChefResponse> findId(@RequestBody Map<String, Object> request)
 			throws Exception {
 
-		String inputMail = getOrDefault.getOrDefaultToString(request, "inputMail", "", inputErrorMessage);
-		System.out.println(inputMail);
+		getOrDefault.getOrDefaultToString(request, "inputMail", "", inputErrorMessage);
 
 		return new ResponseEntity<TodayChefResponse>(null);
 	}
-
-//  @PostMapping("/findPW")
-//  public ResponseEntity<TodayChefResponse> LogOut(HttpServletRequest req, @RequestBody Map<String, Object> request) throws Exception{
-//	  
-//	  
-//	  
-//	  return new ResponseEntity<TodayChefResponse>(null);
-//  }
 }

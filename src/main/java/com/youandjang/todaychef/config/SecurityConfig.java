@@ -3,6 +3,7 @@ package com.youandjang.todaychef.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.youandjang.todaychef.auth.JwtAuthenticationFilter;
 import com.youandjang.todaychef.auth.JwtAuthenticationProvider;
 import com.youandjang.todaychef.auth.JsonWebTokenIssuer;
+import com.youandjang.todaychef.auth.social.SocialLoginFailureHandler;
+import com.youandjang.todaychef.auth.social.SocialLoginSuccessHandler;
 import com.youandjang.todaychef.auth.service.AuthService;
 import com.youandjang.todaychef.util.MessageUtils;
 
@@ -28,6 +31,10 @@ public class SecurityConfig {
 
 	@Autowired
 	private MessageUtils messageUtils;
+	@Autowired
+	private SocialLoginSuccessHandler socialLoginSuccessHandler;
+	@Autowired
+	private SocialLoginFailureHandler socialLoginFailureHandler;
 
 	public SecurityConfig(
 			AuthenticationManagerBuilder authenticationManagerBuilder,
@@ -50,11 +57,29 @@ public class SecurityConfig {
                 "/resources/**",
                 "/error",
                 "/join/**",
-                "/login"
+                "/login",
+                "/social/**",
+                "/oauth2/**",
+                "/login/oauth2/**"
+            ).permitAll()
+            .requestMatchers(
+                HttpMethod.GET,
+                "/recipe/list",
+                "/recipe/all",
+                "/recipe/detail/**",
+                "/recipe/view/**",
+                "/recipe/*",
+                "/recipe/*/comments",
+                "/receipe/list",
+                "/receipe/*",
+                "/receipe/*/comments"
             ).permitAll()
             .anyRequest().authenticated());
+        http.oauth2Login(oauth2 -> oauth2
+			.successHandler(socialLoginSuccessHandler)
+			.failureHandler(socialLoginFailureHandler));
         http.csrf(csrf -> csrf.disable())
-        	.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        	.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
     return http.build();
 }

@@ -10,6 +10,8 @@ public class MemberDto{
 	String userLoginId;
 	String userPassword;
 	String userMail;
+	String socialProvider;
+	String socialUserId;
 	String loginStatusFlag;
 	Timestamp lastLoginDatetime;
 	char stopFlag;
@@ -62,6 +64,18 @@ public class MemberDto{
 	}
 	public void setUserMail(String userMail) {
 		this.userMail = userMail;
+	}
+	public String getSocialProvider() {
+		return socialProvider;
+	}
+	public void setSocialProvider(String socialProvider) {
+		this.socialProvider = socialProvider;
+	}
+	public String getSocialUserId() {
+		return socialUserId;
+	}
+	public void setSocialUserId(String socialUserId) {
+		this.socialUserId = socialUserId;
 	}
 	public String getLoginStatusFlag() {
 		return loginStatusFlag;

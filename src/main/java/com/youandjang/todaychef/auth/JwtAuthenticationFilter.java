@@ -50,7 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String refreshToken = request.getHeader("refreshToken");
 		String servletPath = request.getServletPath();
 		AuthInfoDto authInfo = new AuthInfoDto();
-		if (servletPath.equals("/join/form") || servletPath.equals("/login") || servletPath.startsWith("/join/")) {
+		if (servletPath.equals("/join/form") || servletPath.equals("/login") || servletPath.startsWith("/join/")
+				|| servletPath.startsWith("/social/") || servletPath.startsWith("/oauth2/")
+				|| servletPath.startsWith("/login/oauth2/")) {
 			filterChain.doFilter(request, response);
 			return;
 		}

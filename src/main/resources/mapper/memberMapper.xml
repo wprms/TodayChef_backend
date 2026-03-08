@@ -42,6 +42,8 @@
         ,user_login_id AS userLoginId
         ,user_password AS userPassword
         ,user_mail AS userMail
+        ,social_provider AS socialProvider
+        ,social_user_id AS socialUserId
         ,login_status_flag AS loginStatusFlag
         ,last_login_datetime AS lastLoginDatetime
         ,stop_flag AS stopFlag
@@ -51,6 +53,60 @@
         member_mgt
     WHERE
         user_login_id = #{userId}
+    AND
+        last_gene_flag = '1'
+    AND
+        logical_del_flag = '0'
+</select>
+
+<select id="findBySocialAccount" resultType="com.youandjang.todaychef.member.vo.MemberDto" parameterType="java.util.Map">
+    SELECT
+        user_sys_id AS userSysId
+        ,last_gene_flag AS lastGeneFlag
+        ,user_auth AS userAuth
+        ,todaychef_token AS todaychefToken
+        ,user_login_id AS userLoginId
+        ,user_password AS userPassword
+        ,user_mail AS userMail
+        ,social_provider AS socialProvider
+        ,social_user_id AS socialUserId
+        ,login_status_flag AS loginStatusFlag
+        ,last_login_datetime AS lastLoginDatetime
+        ,stop_flag AS stopFlag
+        ,stop_reason AS stopReason
+        ,temp_flag AS tempFlag
+    FROM
+        member_mgt
+    WHERE
+        social_provider = #{provider}
+    AND
+        social_user_id = #{socialUserId}
+    AND
+        last_gene_flag = '1'
+    AND
+        logical_del_flag = '0'
+</select>
+
+<select id="findByUserSysId" resultType="com.youandjang.todaychef.member.vo.MemberDto" parameterType="String">
+    SELECT
+        user_sys_id AS userSysId
+        ,last_gene_flag AS lastGeneFlag
+        ,user_auth AS userAuth
+        ,todaychef_token AS todaychefToken
+        ,user_login_id AS userLoginId
+        ,user_password AS userPassword
+        ,user_mail AS userMail
+        ,social_provider AS socialProvider
+        ,social_user_id AS socialUserId
+        ,login_status_flag AS loginStatusFlag
+        ,last_login_datetime AS lastLoginDatetime
+        ,stop_flag AS stopFlag
+        ,stop_reason AS stopReason
+        ,temp_flag AS tempFlag
+    FROM
+        member_mgt
+    WHERE
+        user_sys_id = #{userSysId}
     AND
         last_gene_flag = '1'
     AND
@@ -87,6 +143,8 @@
 		user_login_id,
 		user_password,
 		user_mail,
+		social_provider,
+		social_user_id,
 		login_status_flag,
 		last_login_datetime,
 		stop_flag,
@@ -105,6 +163,8 @@
 		#{userLoginId},
 		#{userPassword},
 		#{userMail},
+		#{socialProvider},
+		#{socialUserId},
 		'0',
 		now(),
 		'0',

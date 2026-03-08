@@ -1,7 +1,6 @@
 package com.youandjang.todaychef.auth;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Date;
@@ -139,15 +138,8 @@ public class JsonWebTokenIssuer {
       String[] splitToken = accessToken.split("\\.");
       Decoder decoder = Base64.getDecoder();
       byte[] decodedBytes = decoder.decode(splitToken[1]);
-      String decodedString = null;
-      Map<String, Object> map = null;
-      try {
-         decodedString = new String(decodedBytes, "UTF-8");
-         map = mapper.readValue(decodedBytes, new TypeReference<Map<String, Object>>() {
-         });
-      } catch (UnsupportedEncodingException e) {
-         e.printStackTrace();
-      }
+      Map<String, Object> map = mapper.readValue(decodedBytes, new TypeReference<Map<String, Object>>() {
+      });
       return map;
    }
 

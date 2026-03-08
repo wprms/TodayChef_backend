@@ -19,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youandjang.todaychef.auth.JsonWebTokenIssuer;
 import com.youandjang.todaychef.common.vo.TodayChefResponse;
 import com.youandjang.todaychef.error.constants.ResultCodes;
+import com.youandjang.todaychef.recipe.vo.RecipeCommentDto;
+import com.youandjang.todaychef.recipe.vo.RecipeCommentNotificationDto;
 import com.youandjang.todaychef.recipe.service.RecipeService;
 import com.youandjang.todaychef.recipe.vo.RecipeDto;
 import com.youandjang.todaychef.util.GetOrDefaultUtil;
@@ -51,17 +53,21 @@ public class RecipeApiController {
 		RecipeDto recipeInfo = new RecipeDto();
 		String accessToken = req.getHeader("accessToken");
 		String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
+		Object ingredients = request.get("ingredients") != null ? request.get("ingredients") : List.of();
 		Map<String, Object> recipePayload = new HashMap<String, Object>();
 		recipePayload.put("info", getOrDefault.getOrDefaultToString(request, "info", "", recipeErrorMessage));
+		recipePayload.put("ingredients", ingredients);
 		recipePayload.put("steps", request.get("steps"));
 		
 		recipeInfo.setUserSysId(userId);
 		recipeInfo.setRecipeTitle(getOrDefault.getOrDefaultToString(request, "title", "", recipeErrorMessage));
 		recipeInfo.setRecipeInfo(getOrDefault.getOrDefaultToString(request, "info", "", recipeErrorMessage));
+		recipeInfo.setRecipeIngredients(objectMapper.writeValueAsString(ingredients));
 		recipeInfo.setRecipeSteps(objectMapper.writeValueAsString(recipePayload));
 		recipeInfo.setRecipeThumbnailImage(getOrDefault.getOrDefaultToStringNullable(request, "thumbnailImage", ""));
 		recipeInfo.setRecipeInstagramLink(getOrDefault.getOrDefaultToStringNullable(request, "instagramLink", ""));
 		recipeInfo.setRecipeVideoLink(getOrDefault.getOrDefaultToStringNullable(request, "videoLink", ""));
+		recipeInfo.setRecipeVideoFile(getOrDefault.getOrDefaultToStringNullable(request, "videoFile", ""));
 		
 		recipeService.recipeUpload(recipeInfo);
 
@@ -97,7 +103,20 @@ public class RecipeApiController {
 		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
 	}
 
-	@GetMapping({"/recipe/detail/{id}", "/recipe/{id}", "/recipe/view/{id}", "/receipe/{id}"})
+	@GetMapping("/recipe/detail/{id}")
+	public ResponseEntity<TodayChefResponse> RecipeDetailWithViewCount(@PathVariable("id") String id) throws Exception {
+		TodayChefResponse res = new TodayChefResponse();
+		recipeService.increaseViewCount(id);
+		RecipeDto recipe = recipeService.recipeDetail(id);
+
+		res.setResult(recipe);
+		res.setResultCode(ResultCodes.OK.getCode());
+		res.setResultMessage(messageUtils.getMessage("TodayChef_STI01"));
+
+		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
+	}
+	
+	@GetMapping({"/recipe/{id}", "/recipe/view/{id}", "/receipe/{id}"})
 	public ResponseEntity<TodayChefResponse> RecipeDetail(@PathVariable("id") String id) throws Exception {
 		TodayChefResponse res = new TodayChefResponse();
 		RecipeDto recipe = recipeService.recipeDetail(id);
@@ -108,6 +127,51 @@ public class RecipeApiController {
 
 		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
 	}
+	
+	@GetMapping({"/recipe/{id}/comments", "/receipe/{id}/comments"})
+	public ResponseEntity<TodayChefResponse> RecipeCommentList(@PathVariable("id") String id) throws Exception {
+		TodayChefResponse res = new TodayChefResponse();
+		List<RecipeCommentDto> comments = recipeService.recipeCommentList(id);
+
+		res.setResult(comments);
+		res.setResultCode(ResultCodes.OK.getCode());
+		res.setResultMessage(messageUtils.getMessage("TodayChef_STI01"));
+		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
+	}
+	
+	@GetMapping("/recipe/comment/notifications")
+	public ResponseEntity<TodayChefResponse> RecipeCommentNotifications(HttpServletRequest req) throws Exception {
+		TodayChefResponse res = new TodayChefResponse();
+		String accessToken = req.getHeader("accessToken");
+		String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
+		List<RecipeCommentNotificationDto> notifications = recipeService.recipeCommentNotifications(userId);
+
+		res.setResult(notifications);
+		res.setResultCode(ResultCodes.OK.getCode());
+		res.setResultMessage(messageUtils.getMessage("TodayChef_STI01"));
+		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
+	}
+	
+	@PostMapping({"/recipe/{id}/comments", "/receipe/{id}/comments"})
+	public ResponseEntity<TodayChefResponse> RecipeCommentCreate(HttpServletRequest req, @PathVariable("id") String id,
+			@RequestBody Map<String, Object> request) throws Exception {
+		TodayChefResponse res = new TodayChefResponse();
+		String accessToken = req.getHeader("accessToken");
+		String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
+
+		RecipeCommentDto commentInfo = new RecipeCommentDto();
+		commentInfo.setRecipeId(id);
+		commentInfo.setUserSysId(userId);
+		commentInfo.setCommentText(getOrDefault.getOrDefaultToString(request, "commentText", "", recipeErrorMessage));
+
+		int created = recipeService.recipeCommentCreate(commentInfo);
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("created", created);
+		res.setResult(result);
+		res.setResultCode(ResultCodes.OK.getCode());
+		res.setResultMessage(messageUtils.getMessage("TodayChef_STI01"));
+		return new ResponseEntity<TodayChefResponse>(res, HttpStatus.OK);
+	}
 
 	@PutMapping({"/recipe/{id}", "/receipe/{id}"})
 	public ResponseEntity<TodayChefResponse> RecipeUpdate(HttpServletRequest req, @PathVariable("id") String id,
@@ -115,8 +179,10 @@ public class RecipeApiController {
 		TodayChefResponse res = new TodayChefResponse();
 		String accessToken = req.getHeader("accessToken");
 		String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
+		Object ingredients = request.get("ingredients") != null ? request.get("ingredients") : List.of();
 		Map<String, Object> recipePayload = new HashMap<String, Object>();
 		recipePayload.put("info", getOrDefault.getOrDefaultToString(request, "info", "", recipeErrorMessage));
+		recipePayload.put("ingredients", ingredients);
 		recipePayload.put("steps", request.get("steps"));
 
 		RecipeDto recipeInfo = new RecipeDto();
@@ -124,10 +190,12 @@ public class RecipeApiController {
 		recipeInfo.setUserSysId(userId);
 		recipeInfo.setRecipeTitle(getOrDefault.getOrDefaultToString(request, "title", "", recipeErrorMessage));
 		recipeInfo.setRecipeInfo(getOrDefault.getOrDefaultToString(request, "info", "", recipeErrorMessage));
+		recipeInfo.setRecipeIngredients(objectMapper.writeValueAsString(ingredients));
 		recipeInfo.setRecipeSteps(objectMapper.writeValueAsString(recipePayload));
 		recipeInfo.setRecipeThumbnailImage(getOrDefault.getOrDefaultToStringNullable(request, "thumbnailImage", ""));
 		recipeInfo.setRecipeInstagramLink(getOrDefault.getOrDefaultToStringNullable(request, "instagramLink", ""));
 		recipeInfo.setRecipeVideoLink(getOrDefault.getOrDefaultToStringNullable(request, "videoLink", ""));
+		recipeInfo.setRecipeVideoFile(getOrDefault.getOrDefaultToStringNullable(request, "videoFile", ""));
 
 		int updated = recipeService.recipeUpdate(recipeInfo);
 		Map<String, Object> result = new HashMap<String, Object>();
