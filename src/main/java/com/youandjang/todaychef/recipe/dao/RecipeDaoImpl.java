@@ -1,6 +1,10 @@
 package com.youandjang.todaychef.recipe.dao;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Repository;
 
 import com.youandjang.todaychef.config.HelpSqlSessionTemplate;
@@ -12,6 +16,34 @@ public class RecipeDaoImpl extends HelpSqlSessionTemplate implements RecipeDao {
 	@Override
 	public int recipeUpload(RecipeDto recipeInfo) {
 		return getSqlSessionTemplate().insert("recipeMapper.recipeUpload", recipeInfo);
+	}
+
+	@Override
+	public List<RecipeDto> recipeList() {
+		return getSqlSessionTemplate().selectList("recipeMapper.recipeList");
+	}
+
+	@Override
+	public List<RecipeDto> myRecipeList(String userId) {
+		return getSqlSessionTemplate().selectList("recipeMapper.myRecipeList", userId);
+	}
+
+	@Override
+	public RecipeDto recipeDetail(String id) {
+		return getSqlSessionTemplate().selectOne("recipeMapper.recipeDetail", id);
+	}
+
+	@Override
+	public int recipeUpdate(RecipeDto recipeInfo) {
+		return getSqlSessionTemplate().update("recipeMapper.recipeUpdate", recipeInfo);
+	}
+
+	@Override
+	public int recipeDelete(String id, String userId) {
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("id", id);
+		param.put("userId", userId);
+		return getSqlSessionTemplate().update("recipeMapper.recipeDelete", param);
 	}
 
 }
