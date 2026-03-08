@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youandjang.todaychef.recipe.dao.RecipeDao;
+import com.youandjang.todaychef.recipe.vo.RecipeCommentDto;
+import com.youandjang.todaychef.recipe.vo.RecipeCommentNotificationDto;
 import com.youandjang.todaychef.recipe.vo.RecipeDto;
 
 @Service
@@ -45,6 +47,22 @@ public class RecipeService {
 		}
 		return recipeDto;
 	}
+	
+	public int increaseViewCount(String id) throws Exception {
+		return mapper.increaseViewCount(id);
+	}
+	
+	public List<RecipeCommentDto> recipeCommentList(String recipeId) throws Exception {
+		return mapper.recipeCommentList(recipeId);
+	}
+	
+	public int recipeCommentCreate(RecipeCommentDto commentInfo) throws Exception {
+		return mapper.recipeCommentCreate(commentInfo);
+	}
+	
+	public List<RecipeCommentNotificationDto> recipeCommentNotifications(String userSysId) throws Exception {
+		return mapper.recipeCommentNotifications(userSysId);
+	}
 
 	public int recipeUpdate(RecipeDto recipeInfo) throws Exception {
 		return mapper.recipeUpdate(recipeInfo);
@@ -58,6 +76,9 @@ public class RecipeService {
 		String rawSteps = recipeDto.getRecipeSteps();
 		if (rawSteps == null) {
 			recipeDto.setRecipeInfo("");
+			if (recipeDto.getRecipeIngredients() == null) {
+				recipeDto.setRecipeIngredients("");
+			}
 			recipeDto.setRecipeSteps("[]");
 			return;
 		}
@@ -66,11 +87,20 @@ public class RecipeService {
 			JsonNode parsed = objectMapper.readTree(rawSteps);
 			if (parsed.isObject()) {
 				JsonNode info = parsed.get("info");
+				JsonNode ingredients = parsed.get("ingredients");
 				JsonNode steps = parsed.get("steps");
 				if (info != null && !info.isNull()) {
 					recipeDto.setRecipeInfo(info.asText());
 				} else if (recipeDto.getRecipeInfo() == null) {
 					recipeDto.setRecipeInfo("");
+				}
+				if ((recipeDto.getRecipeIngredients() == null || recipeDto.getRecipeIngredients().isBlank())
+						&& ingredients != null && !ingredients.isNull()) {
+					if (ingredients.isTextual()) {
+						recipeDto.setRecipeIngredients(ingredients.asText());
+					} else {
+						recipeDto.setRecipeIngredients(objectMapper.writeValueAsString(ingredients));
+					}
 				}
 				recipeDto.setRecipeSteps(steps != null ? objectMapper.writeValueAsString(steps) : "[]");
 				return;
@@ -78,6 +108,9 @@ public class RecipeService {
 			if (parsed.isArray()) {
 				if (recipeDto.getRecipeInfo() == null) {
 					recipeDto.setRecipeInfo("");
+				}
+				if (recipeDto.getRecipeIngredients() == null) {
+					recipeDto.setRecipeIngredients("");
 				}
 				recipeDto.setRecipeSteps(objectMapper.writeValueAsString(parsed));
 				return;
@@ -88,6 +121,9 @@ public class RecipeService {
 
 		if (recipeDto.getRecipeInfo() == null) {
 			recipeDto.setRecipeInfo("");
+		}
+		if (recipeDto.getRecipeIngredients() == null) {
+			recipeDto.setRecipeIngredients("");
 		}
 		recipeDto.setRecipeSteps("[]");
 	}

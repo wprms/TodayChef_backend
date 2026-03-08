@@ -10,4 +10,8 @@ public interface LoginDao {
 	public int logoutToken(Map<String, Object> userInfo) throws Exception;
 
 	MemberDto findLoginId(String userId) throws Exception;
+
+	MemberDto findBySocialAccount(String provider, String socialUserId) throws Exception;
+
+	MemberDto findByUserSysId(String userSysId) throws Exception;
 }

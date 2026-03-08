@@ -7,10 +7,13 @@ public class RecipeDto {
 	String userSysId;
 	String recipeTitle;
 	String recipeInfo;
+	String recipeIngredients;
 	String recipeSteps;
+	int viewCount;
 	String recipeThumbnailImage;
 	String recipeInstagramLink;
 	String recipeVideoLink;
+	String recipeVideoFile;
 	String recCreateId;
 	String recUpdateId;
 	Timestamp recUpdateDateTime;
@@ -42,11 +45,23 @@ public class RecipeDto {
 	public void setRecipeInfo(String recipeInfo) {
 		this.recipeInfo = recipeInfo;
 	}
+	public String getRecipeIngredients() {
+		return recipeIngredients;
+	}
+	public void setRecipeIngredients(String recipeIngredients) {
+		this.recipeIngredients = recipeIngredients;
+	}
 	public String getRecipeSteps() {
 		return recipeSteps;
 	}
 	public void setRecipeSteps(String recipeSteps) {
 		this.recipeSteps = recipeSteps;
+	}
+	public int getViewCount() {
+		return viewCount;
+	}
+	public void setViewCount(int viewCount) {
+		this.viewCount = viewCount;
 	}
 	public String getRecipeThumbnailImage() {
 		return recipeThumbnailImage;
@@ -65,6 +80,12 @@ public class RecipeDto {
 	}
 	public void setRecipeVideoLink(String recipeVideoLink) {
 		this.recipeVideoLink = recipeVideoLink;
+	}
+	public String getRecipeVideoFile() {
+		return recipeVideoFile;
+	}
+	public void setRecipeVideoFile(String recipeVideoFile) {
+		this.recipeVideoFile = recipeVideoFile;
 	}
 	public String getRecCreateId() {
 		return recCreateId;

@@ -25,6 +25,19 @@ public class LoginDaoImpl extends HelpSqlSessionTemplate implements LoginDao {
 	}
 
 	@Override
+	public MemberDto findBySocialAccount(String provider, String socialUserId) throws Exception {
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("provider", provider);
+		param.put("socialUserId", socialUserId);
+		return getSqlSessionTemplate().selectOne("memberMapper.findBySocialAccount", param);
+	}
+
+	@Override
+	public MemberDto findByUserSysId(String userSysId) throws Exception {
+		return getSqlSessionTemplate().selectOne("memberMapper.findByUserSysId", userSysId);
+	}
+
+	@Override
 	public int logoutToken(Map<String, Object> userInfo) throws Exception {
 		return getSqlSessionTemplate().update("memberMapper.logoutToken", userInfo);
 	}
