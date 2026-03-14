@@ -2,8 +2,10 @@ package com.youandjang.todaychef.auth;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.util.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,27 +32,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	public static final String BEARER_PREFIX = "Bearer ";
 
 	private final AuthenticationManager authenticationManager;
-	private AuthService authService;
-	private MessageUtils messageUtils;
+	private final AuthService authService;
+	private final MessageUtils messageUtils;
+	private final JsonWebTokenIssuer jwtIssuer;
 	
-	private JsonWebTokenIssuer jwtIssuer = new JsonWebTokenIssuer();
-	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AuthService authService, MessageUtils messageUtils) {
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, AuthService authService, MessageUtils messageUtils,
+			JsonWebTokenIssuer jwtIssuer) {
 		this.authenticationManager = authenticationManager;
 		this.authService = authService;
 		this.messageUtils = messageUtils;
+		this.jwtIssuer = jwtIssuer;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		String accessToken = request.getHeader("accessToken");
-		String refreshToken = null;
+		String refreshToken = request.getHeader("refreshToken");
 		String servletPath = request.getServletPath();
 		AuthInfoDto authInfo = new AuthInfoDto();
-			if (servletPath.equals("/join/form") || servletPath.equals("/join/form")) {
-				filterChain.doFilter(request, response);
-				return;
-			}
+		if (servletPath.equals("/join/form") || servletPath.equals("/login") || servletPath.startsWith("/join/")
+				|| servletPath.startsWith("/social/") || servletPath.startsWith("/oauth2/")
+				|| servletPath.startsWith("/login/oauth2/")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		if (accessToken != null) {
 			if (jwtIssuer.validateToken(accessToken)) {
@@ -68,18 +73,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			            throw new InvalidTokenException(messages, "STB02");
 					}
 					
-
-			//		if (authInfo.getStatusFlag().charAt(0) == '1') {
-			//			SecurityContextHolder.clearContext();
-			//			response.setHeader("accessToken", "");
-			//		}
-					
 					try {
-						Timestamp lastLoginDatetime = Timestamp.valueOf(request.getHeader("lastLoginTime")); 
+						String lastLoginTimeHeader = request.getHeader("lastLoginTime");
 						Timestamp lastLogin = authInfo.getLastLoginDatetime();
-							// jobseeker not check duplicate access
-						if (!lastLoginDatetime.equals(lastLogin)) {
-							if (lastLoginDatetime.before(lastLogin)) {
+						if (StringUtils.hasText(lastLoginTimeHeader) && lastLogin != null) {
+							Timestamp lastLoginDatetime = Timestamp.valueOf(lastLoginTimeHeader);
+							if (!lastLoginDatetime.equals(lastLogin) && lastLoginDatetime.before(lastLogin)) {
 								SecurityContextHolder.clearContext();
 								response.setHeader("accessToken", "");
 							}
@@ -93,8 +92,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					SecurityContextHolder.clearContext();
 					String messages = messageUtils.getMessage("TodayChef_STB02");
 		            throw new UserLoginException(messages, "STB02");
-				}
-			} else if (!jwtIssuer.validateToken(accessToken)) {
+					}
+				} else if (!jwtIssuer.validateToken(accessToken)) {
 				//accessTokenからPayloadのsub（UserId）を抽出する。
 				String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
 				try {
@@ -105,10 +104,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		            throw new UserLoginException(messages, "STB02");
 				}
 				
-				if (authInfo.getTodaychefToken() != null) {
+				String savedRefreshToken = authInfo.getTodaychefToken();
+				if (StringUtils.hasText(savedRefreshToken) && StringUtils.hasText(refreshToken)) {
 					// REISSUE AND Check
 					boolean validateRefreshToken = jwtIssuer.validateRefreshToken(refreshToken);
-					if (validateRefreshToken) {
+					boolean isStoredToken = Objects.equals(savedRefreshToken, refreshToken);
+					boolean isRefreshOwner = Objects.equals(jwtIssuer.refreshUserIdCheck(refreshToken), userId);
+					if (validateRefreshToken && isStoredToken && isRefreshOwner) {
 						// Refresh Token Check
 						String newAccessToken = jwtIssuer.createAccessToken(userId);
 						jwtIssuer.setHeaderAccessToken(response, newAccessToken);

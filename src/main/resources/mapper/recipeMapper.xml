@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="recipeMapper">
+<insert id="recipeUpload" parameterType="com.youandjang.todaychef.recipe.vo.RecipeDto"> 
+	INSERT
+	INTO recipe_mgt(
+		user_sys_id,
+		recipe_title,
+		recipe_info,
+		recipe_ingredients,
+		recipe_steps,
+		view_count,
+		recipe_thumbnail_image,
+		recipe_Instagram_link,
+		recipe_video_link,
+		recipe_video_file,
+		rec_create_id,
+		rec_create_date,
+		rec_update_id,
+		rec_update_date,
+		logical_del_flag
+	) VALUES (
+		#{userSysId},
+		#{recipeTitle},
+		#{recipeInfo},
+		#{recipeIngredients},
+		#{recipeSteps},
+		0,
+		#{recipeThumbnailImage},
+		#{recipeInstagramLink},
+		#{recipeVideoLink},
+		#{recipeVideoFile},
+		#{userSysId},
+		now(),
+		#{userSysId},
+		now(),
+		'0'	
+	)
+</insert>
+
+<select id="recipeList" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_ingredients AS recipeIngredients,
+		recipe_steps AS recipeSteps,
+		view_count AS viewCount,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		recipe_video_file AS recipeVideoFile,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	ORDER BY
+		rec_create_date DESC
+</select>
+
+<select id="recipeDetail" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto" parameterType="String">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_ingredients AS recipeIngredients,
+		recipe_steps AS recipeSteps,
+		view_count AS viewCount,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		recipe_video_file AS recipeVideoFile,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+</select>
+
+<select id="myRecipeList" resultType="com.youandjang.todaychef.recipe.vo.RecipeDto" parameterType="String">
+	SELECT
+		recipe_id::text AS id,
+		user_sys_id AS userSysId,
+		recipe_title AS recipeTitle,
+		recipe_info AS recipeInfo,
+		recipe_ingredients AS recipeIngredients,
+		recipe_steps AS recipeSteps,
+		view_count AS viewCount,
+		recipe_thumbnail_image AS recipeThumbnailImage,
+		recipe_instagram_link AS recipeInstagramLink,
+		recipe_video_link AS recipeVideoLink,
+		recipe_video_file AS recipeVideoFile,
+		rec_create_date AS recCreateDatetime
+	FROM
+		recipe_mgt
+	WHERE
+		logical_del_flag = '0'
+	AND
+		user_sys_id = #{userId}
+	ORDER BY
+		rec_create_date DESC
+</select>
+
+<update id="recipeUpdate" parameterType="com.youandjang.todaychef.recipe.vo.RecipeDto">
+	UPDATE
+		recipe_mgt
+	SET
+		recipe_title = #{recipeTitle},
+		recipe_info = #{recipeInfo},
+		recipe_ingredients = #{recipeIngredients},
+		recipe_steps = #{recipeSteps},
+		recipe_thumbnail_image = #{recipeThumbnailImage},
+		recipe_instagram_link = #{recipeInstagramLink},
+		recipe_video_link = #{recipeVideoLink},
+		recipe_video_file = #{recipeVideoFile},
+		rec_update_id = #{userSysId},
+		rec_update_date = now()
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+	AND
+		user_sys_id = #{userSysId}
+</update>
+
+<update id="recipeDelete" parameterType="java.util.Map">
+	UPDATE
+		recipe_mgt
+	SET
+		logical_del_flag = '1',
+		rec_update_id = #{userId},
+		rec_update_date = now()
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+	AND
+		user_sys_id = #{userId}
+</update>
+
+<update id="increaseViewCount" parameterType="String">
+	UPDATE
+		recipe_mgt
+	SET
+		view_count = COALESCE(view_count, 0) + 1,
+		rec_update_date = now()
+	WHERE
+		logical_del_flag = '0'
+	AND
+		recipe_id = CAST(#{id} AS BIGINT)
+</update>
+
+<select id="recipeCommentList" resultType="com.youandjang.todaychef.recipe.vo.RecipeCommentDto" parameterType="String">
+	SELECT
+		rcm.comment_id::text AS commentId,
+		rcm.recipe_id::text AS recipeId,
+		rcm.user_sys_id AS userSysId,
+		COALESCE(mm.user_login_id, rcm.user_sys_id) AS writerId,
+		rcm.comment_text AS commentText,
+		rcm.rec_create_date AS recCreateDatetime
+	FROM
+		recipe_comment_mgt rcm
+	LEFT JOIN member_mgt mm ON mm.user_sys_id = rcm.user_sys_id
+	WHERE
+		rcm.logical_del_flag = '0'
+	AND
+		rcm.recipe_id = CAST(#{recipeId} AS BIGINT)
+	ORDER BY
+		rcm.rec_create_date ASC
+</select>
+
+<insert id="recipeCommentCreate" parameterType="com.youandjang.todaychef.recipe.vo.RecipeCommentDto">
+	INSERT
+	INTO recipe_comment_mgt(
+		recipe_id,
+		user_sys_id,
+		comment_text,
+		rec_create_id,
+		rec_create_date,
+		rec_update_id,
+		rec_update_date,
+		logical_del_flag
+	) VALUES (
+		CAST(#{recipeId} AS BIGINT),
+		#{userSysId},
+		#{commentText},
+		#{userSysId},
+		now(),
+		#{userSysId},
+		now(),
+		'0'
+	)
+</insert>
+
+<select id="recipeCommentNotifications" resultType="com.youandjang.todaychef.recipe.vo.RecipeCommentNotificationDto" parameterType="String">
+	SELECT
+		rcm.comment_id::text AS commentId,
+		rm.recipe_id::text AS recipeId,
+		rm.recipe_title AS recipeTitle,
+		COALESCE(mm.user_login_id, rcm.user_sys_id) AS writerId,
+		rcm.comment_text AS commentText,
+		rcm.rec_create_date AS recCreateDatetime
+	FROM
+		recipe_comment_mgt rcm
+	INNER JOIN recipe_mgt rm ON rm.recipe_id = rcm.recipe_id
+	LEFT JOIN member_mgt mm ON mm.user_sys_id = rcm.user_sys_id
+	WHERE
+		rcm.logical_del_flag = '0'
+	AND
+		rm.logical_del_flag = '0'
+	AND
+		rm.user_sys_id = #{userSysId}
+	AND
+		rcm.user_sys_id != #{userSysId}
+	ORDER BY
+		rcm.rec_create_date DESC
+	LIMIT 20
+</select>
+</mapper>

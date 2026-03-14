@@ -7,7 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import com.youandjang.todaychef.auth.JsonWebTokenIssuer;
+import com.youandjang.todaychef.auth.exception.JwtInvalidException;
 import com.youandjang.todaychef.auth.vo.ScreenMasterDto;
 import com.youandjang.todaychef.common.service.CommonService;
 import com.youandjang.todaychef.error.constants.ScreenCodes;
@@ -18,47 +21,54 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @Component
 public class AuthCheckUtil {
-   @Autowired
-   MessageUtils messegeUtils;
-   @Autowired
-   CommonService commonService;
-   
-   private final Logger logger = LoggerFactory.getLogger(this.getClass());
-   
-   public String authCheck(Enum<ScreenCodes> scrnCode, HttpServletRequest req) throws Exception{
+	@Autowired
+	MessageUtils messegeUtils;
+	@Autowired
+	CommonService commonService;
+	@Autowired
+	JsonWebTokenIssuer jwtIssuer;
 
-      List<ScreenMasterDto> authScrns = new ArrayList<ScreenMasterDto>();
-        String userId = TakeIdUtil.takeIdUtility(req);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-      boolean authFlg = false;
-      String authCode = "";
-      
-      MemberDto dto = new MemberDto();
-      
-      dto = commonService.findMemberId(userId);
-      authCode = dto.getAuth();
-      
-      authScrns = (List<ScreenMasterDto>) commonService.findAccessibleScreen(authCode);
+	public String authCheck(Enum<ScreenCodes> scrnCode, HttpServletRequest req) throws Exception {
 
-      if (authScrns == null) {
-         String errorMsg = messegeUtils.getMessage("TodayChef_STB04");
-         logger.error(errorMsg);
-          throw new TodayChefAuthException(errorMsg, "B04");
-      }
+		List<ScreenMasterDto> authScrns = new ArrayList<ScreenMasterDto>();
 
-      for (ScreenMasterDto scrnDto : authScrns) {
-         if (scrnCode.toString().equals(scrnDto.getScreenCode())) {
-            authFlg = true;
-            break;
-         }
-      }
-      
-      if (!authFlg) {
-         String errorMsg = messegeUtils.getMessage("TodayChef_STB04");
-         logger.error(errorMsg);
-          throw new TodayChefAuthException(errorMsg, "B04");
-      }
-      
-      return userId;
-   }
+		String accessToken = req.getHeader("accessToken");
+		if (!StringUtils.hasText(accessToken)) {
+			throw new JwtInvalidException(null);
+		}
+		String userId = jwtIssuer.decoder(accessToken).get("sub").toString();
+
+		boolean authFlg = false;
+		String authCode = "";
+
+		MemberDto dto = new MemberDto();
+
+		dto = commonService.findMemberId(userId);
+		authCode = dto.getUserAuth();
+
+		authScrns = (List<ScreenMasterDto>) commonService.findAccessibleScreen(authCode);
+
+		if (authScrns == null) {
+			String errorMsg = messegeUtils.getMessage("TodayChef_STB04");
+			logger.error(errorMsg);
+			throw new TodayChefAuthException(errorMsg, "B04");
+		}
+
+		for (ScreenMasterDto scrnDto : authScrns) {
+			if (scrnCode.toString().equals(scrnDto.getScreenCode())) {
+				authFlg = true;
+				break;
+			}
+		}
+
+		if (!authFlg) {
+			String errorMsg = messegeUtils.getMessage("TodayChef_STB04");
+			logger.error(errorMsg);
+			throw new TodayChefAuthException(errorMsg, "B04");
+		}
+
+		return userId;
+	}
 }

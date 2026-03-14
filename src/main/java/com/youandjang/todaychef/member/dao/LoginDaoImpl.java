@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.youandjang.todaychef.config.HelpSqlSessionTemplate;
 import com.youandjang.todaychef.member.vo.MemberDto;
 
-
 @Repository
 public class LoginDaoImpl extends HelpSqlSessionTemplate implements LoginDao {
 
@@ -23,6 +22,19 @@ public class LoginDaoImpl extends HelpSqlSessionTemplate implements LoginDao {
 	@Override
 	public MemberDto findLoginId(String userId) throws Exception {
 		return getSqlSessionTemplate().selectOne("memberMapper.findLoginId", userId);
+	}
+
+	@Override
+	public MemberDto findBySocialAccount(String provider, String socialUserId) throws Exception {
+		Map<String, String> param = new HashMap<String, String>();
+		param.put("provider", provider);
+		param.put("socialUserId", socialUserId);
+		return getSqlSessionTemplate().selectOne("memberMapper.findBySocialAccount", param);
+	}
+
+	@Override
+	public MemberDto findByUserSysId(String userSysId) throws Exception {
+		return getSqlSessionTemplate().selectOne("memberMapper.findByUserSysId", userSysId);
 	}
 
 	@Override

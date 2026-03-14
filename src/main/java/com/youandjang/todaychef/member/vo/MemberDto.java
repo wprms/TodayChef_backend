@@ -4,33 +4,48 @@ import java.sql.Timestamp;
 
 public class MemberDto{
 	String userSysId;
+	String lastGeneFlag;
+	String userAuth;
+	String todaychefToken;
 	String userLoginId;
 	String userPassword;
-	String userName;
 	String userMail;
-	String joinDate;
-	String customerId;
-	String auth;
+	String socialProvider;
+	String socialUserId;
 	String loginStatusFlag;
-	char tempFlag;
+	Timestamp lastLoginDatetime;
 	char stopFlag;
 	String stopReason;
+	char tempFlag;
+	String recCreateId;
+	String recUpdateId;
 	Timestamp recUpdateDateTime;
 	Timestamp recCreateDatetime;
-	Timestamp lastLoginDatetime;
 	char logicalDelFlag;
 	
-	public String getUserMail() {
-		return userMail;
-	}
-	public void setUserMail(String userMail) {
-		this.userMail = userMail;
-	}
 	public String getUserSysId() {
 		return userSysId;
 	}
 	public void setUserSysId(String userSysId) {
 		this.userSysId = userSysId;
+	}
+	public String getLastGeneFlag() {
+		return lastGeneFlag;
+	}
+	public void setLastGeneFlag(String lastGeneFlag) {
+		this.lastGeneFlag = lastGeneFlag;
+	}
+	public String getUserAuth() {
+		return userAuth;
+	}
+	public void setUserAuth(String userAuth) {
+		this.userAuth = userAuth;
+	}
+	public String getTodaychefToken() {
+		return todaychefToken;
+	}
+	public void setTodaychefToken(String todaychefToken) {
+		this.todaychefToken = todaychefToken;
 	}
 	public String getUserLoginId() {
 		return userLoginId;
@@ -44,29 +59,23 @@ public class MemberDto{
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
-	public String getUserName() {
-		return userName;
+	public String getUserMail() {
+		return userMail;
 	}
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserMail(String userMail) {
+		this.userMail = userMail;
 	}
-	public String getJoinDate() {
-		return joinDate;
+	public String getSocialProvider() {
+		return socialProvider;
 	}
-	public void setJoinDate(String joinDate) {
-		this.joinDate = joinDate;
+	public void setSocialProvider(String socialProvider) {
+		this.socialProvider = socialProvider;
 	}
-	public String getCustomerId() {
-		return customerId;
+	public String getSocialUserId() {
+		return socialUserId;
 	}
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
-	}
-	public String getAuth() {
-		return auth;
-	}
-	public void setAuth(String auth) {
-		this.auth = auth;
+	public void setSocialUserId(String socialUserId) {
+		this.socialUserId = socialUserId;
 	}
 	public String getLoginStatusFlag() {
 		return loginStatusFlag;
@@ -74,11 +83,11 @@ public class MemberDto{
 	public void setLoginStatusFlag(String loginStatusFlag) {
 		this.loginStatusFlag = loginStatusFlag;
 	}
-	public char getTempFlag() {
-		return tempFlag;
+	public Timestamp getLastLoginDatetime() {
+		return lastLoginDatetime;
 	}
-	public void setTempFlag(char tempFlag) {
-		this.tempFlag = tempFlag;
+	public void setLastLoginDatetime(Timestamp lastLoginDatetime) {
+		this.lastLoginDatetime = lastLoginDatetime;
 	}
 	public char getStopFlag() {
 		return stopFlag;
@@ -92,6 +101,24 @@ public class MemberDto{
 	public void setStopReason(String stopReason) {
 		this.stopReason = stopReason;
 	}
+	public char getTempFlag() {
+		return tempFlag;
+	}
+	public void setTempFlag(char tempFlag) {
+		this.tempFlag = tempFlag;
+	}
+	public String getRecCreateId() {
+		return recCreateId;
+	}
+	public void setRecCreateId(String recCreateId) {
+		this.recCreateId = recCreateId;
+	}
+	public String getRecUpdateId() {
+		return recUpdateId;
+	}
+	public void setRecUpdateId(String recUpdateId) {
+		this.recUpdateId = recUpdateId;
+	}
 	public Timestamp getRecUpdateDateTime() {
 		return recUpdateDateTime;
 	}
@@ -104,19 +131,11 @@ public class MemberDto{
 	public void setRecCreateDatetime(Timestamp recCreateDatetime) {
 		this.recCreateDatetime = recCreateDatetime;
 	}
-	public Timestamp getLastLoginDatetime() {
-		return lastLoginDatetime;
-	}
-	public void setLastLoginDatetime(Timestamp lastLoginDatetime) {
-		this.lastLoginDatetime = lastLoginDatetime;
-	}
 	public char getLogicalDelFlag() {
 		return logicalDelFlag;
 	}
 	public void setLogicalDelFlag(char logicalDelFlag) {
 		this.logicalDelFlag = logicalDelFlag;
 	}
-	
-	
 	
 }

@@ -11,19 +11,26 @@ import com.youandjang.todaychef.member.vo.MemberDto;
 @Service
 public class LoginService {
 
-	@Autowired 
-	public LoginDao mapper; 
-	
+	@Autowired
+	public LoginDao mapper;
+
 	public int login(String refreshToken, String userId) throws Exception {
 		return mapper.login(refreshToken, userId);
 	}
-	
-	public int logoutToken(Map<String,Object> userInfo) throws Exception{
+
+	public int logoutToken(Map<String, Object> userInfo) throws Exception {
 		return mapper.logoutToken(userInfo);
 	}
-	
-	
-	public MemberDto findLoginId(String userId) throws Exception{
+
+	public MemberDto findLoginId(String userId) throws Exception {
 		return mapper.findLoginId(userId);
+	}
+
+	public MemberDto findBySocialAccount(String provider, String socialUserId) throws Exception {
+		return mapper.findBySocialAccount(provider, socialUserId);
+	}
+
+	public MemberDto findByUserSysId(String userSysId) throws Exception {
+		return mapper.findByUserSysId(userSysId);
 	}
 }
